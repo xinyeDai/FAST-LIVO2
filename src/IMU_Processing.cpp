@@ -12,6 +12,7 @@ which is included as part of this source code package.
 
 #include "IMU_Processing.h"
 
+#define M_PI 3.14159265358979323846
 const bool time_list(PointType &x, PointType &y) { return (x.curvature < y.curvature); }
 
 ImuProcess::ImuProcess() : Eye3d(M3D::Identity()),
