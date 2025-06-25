@@ -99,6 +99,7 @@ find_package(OpenCV REQUIRED)
 find_package(Sophus REQUIRED)
 find_package(Boost REQUIRED COMPONENTS thread)
 find_package(rs_driver REQUIRED)
+find_package(GTSAM QUIET)
 
 set(Sophus_LIBRARIES "/usr/local/lib/libSophus.so")
 set(Sophus_INCLUDE_DIRS "/usr/local/include")
@@ -106,7 +107,7 @@ set(Sophus_INCLUDE_DIRS "/usr/local/include")
 # Define the catkin package
 catkin_package(
   CATKIN_DEPENDS geometry_msgs nav_msgs roscpp rospy std_msgs message_runtime cv_bridge vikit_common vikit_ros image_transport
-  DEPENDS EIGEN3 PCL OpenCV Sophus
+  DEPENDS EIGEN3 PCL OpenCV Sophus GTSAM
 )
 
 # Include directories for dependencies
@@ -117,6 +118,7 @@ include_directories(
   ${OpenCV_INCLUDE_DIRS}
   ${Sophus_INCLUDE_DIRS}
   ${rs_driver_INCLUDE_DIRS}
+  ${GTSAM_INCLUDE_DIRS}
   include
 )
 
@@ -126,6 +128,8 @@ add_library(lio src/voxel_map.cpp)
 add_library(pre src/preprocess.cpp)
 add_library(imu_proc src/IMU_Processing.cpp)
 add_library(laser_mapping src/LIVMapper.cpp)
+add_library(gnss_factor src/gnss_factor.cpp)
+target_link_libraries(gnss_factor ${GTSAM_LIBRARIES})
 
 # Add the main executable
 add_executable(fastlivo_mapping src/main.cpp)
@@ -137,11 +141,13 @@ target_link_libraries(fastlivo_mapping
   lio
   pre
   imu_proc
+  gnss_factor
   ${catkin_LIBRARIES}
   ${PCL_LIBRARIES}
   ${OpenCV_LIBRARIES}
   ${Sophus_LIBRARIES}
   ${Boost_LIBRARIES}
+  ${GTSAM_LIBRARIES}
 )
 
 # Add preprocess executable

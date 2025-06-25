@@ -98,6 +98,12 @@ roslaunch fast_livo mapping_avia.launch
 rosbag play YOUR_DOWNLOADED.bag
 ```
 
+### 4.1 GNSS factor (experimental)
+
+A basic GNSS factor based on GTSAM is provided in `include/gnss_factor.h` and
+`src/gnss_factor.cpp`. It can be used to add GNSS position constraints when
+building a factor graph.
+
 
 ## 5. License
 
