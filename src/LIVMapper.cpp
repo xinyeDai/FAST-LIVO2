@@ -181,6 +181,12 @@ void LIVMapper::initializeFiles()
   if(pcd_save_interval > 0) fout_pcd_pos.open(std::string(ROOT_DIR) + "Log/PCD/scans_pos.json", std::ios::out);
   fout_pre.open(DEBUG_FILE_DIR("mat_pre.txt"), std::ios::out);
   fout_out.open(DEBUG_FILE_DIR("mat_out.txt"), std::ios::out);
+  tum_file.open(DEBUG_FILE_DIR("fastlivo2_tum.txt"), std::ios::out);
+  // ① 关闭科学计数法，启用定点格式
+  tum_file.setf(std::ios::fixed, std::ios::floatfield);
+
+  // ② 全文件统一小数位；时间戳建议 6-9 位，位置 6 位足够，本处为了对应ref，改成 2 位
+  tum_file << std::setprecision(2);
 }
 
 void LIVMapper::initializeSubscribersAndPublishers(ros::NodeHandle &nh, image_transport::ImageTransport &it) 
@@ -320,6 +326,17 @@ void LIVMapper::handleVIO()
 
   publish_frame_world(pubLaserCloudFullRes, vio_manager);
   publish_img_rgb(pubImage, vio_manager);
+
+  // save path as tum format
+  double ts = LidarMeasures.last_lio_update_time; // 秒
+  Eigen::Quaterniond q(_state.rot_end.normalized());
+
+  tum_file << ts << " "
+          << _state.pos_end.x() << " "
+          << _state.pos_end.y() << " "
+          << _state.pos_end.z() << " "
+          << q.x() << " " << q.y() << " " << q.z() << " " << q.w()
+          << std::endl;
 
   euler_cur = RotMtoEuler(_state.rot_end);
   fout_out << std::setw(20) << LidarMeasures.last_lio_update_time - _first_lidar_time << " " << euler_cur.transpose() * 57.3 << " "
@@ -468,6 +485,18 @@ void LIVMapper::handleLIO()
   printf("\033[1;36m| %-29s | %-27f |\033[0m\n", "Current Total Time", t4 - t0);
   printf("\033[1;36m| %-29s | %-27f |\033[0m\n", "Average Total Time", aver_time_consu);
   printf("\033[1;34m+-------------------------------------------------------------+\033[0m\n");
+
+  // save path as tum format
+  double ts = LidarMeasures.last_lio_update_time; // 秒
+  Eigen::Quaterniond q(_state.rot_end.normalized());
+
+  tum_file << ts << " "
+          << _state.pos_end.x() << " "
+          << _state.pos_end.y() << " "
+          << _state.pos_end.z() << " "
+          << q.x() << " " << q.y() << " " << q.z() << " " << q.w()
+          << std::endl;
+
 
   euler_cur = RotMtoEuler(_state.rot_end);
   fout_out << std::setw(20) << LidarMeasures.last_lio_update_time - _first_lidar_time << " " << euler_cur.transpose() * 57.3 << " "
@@ -787,6 +816,22 @@ void LIVMapper::imu_cbk(const sensor_msgs::Imu::ConstPtr &msg_in)
   // }
 
   last_timestamp_imu = timestamp;
+
+  // // 计算加速度模长
+  // double ax = msg->linear_acceleration.x;
+  // double ay = msg->linear_acceleration.y;
+  // double az = msg->linear_acceleration.z;
+  // double acc_norm = std::sqrt(ax * ax + ay * ay + az * az);
+
+  // // 计算角速度模长
+  // double wx = msg->angular_velocity.x;
+  // double wy = msg->angular_velocity.y;
+  // double wz = msg->angular_velocity.z;
+  // double gyr_norm = std::sqrt(wx * wx + wy * wy + wz * wz);
+
+  // // 打印模长信息
+  // ROS_INFO("[IMU] t = %.6f | acc_norm = %.4f m/s^2 | gyr_norm = %.4f rad/s",
+  //          timestamp, acc_norm, gyr_norm);
 
   imu_buffer.push_back(msg);
   // cout<<"got imu: "<<timestamp<<" imu size "<<imu_buffer.size()<<endl;

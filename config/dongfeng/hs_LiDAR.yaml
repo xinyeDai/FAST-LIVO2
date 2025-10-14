@@ -2,8 +2,11 @@ common:
   # 勿改
   lid_topic: "/velodyne_points"
   
-  hesai_topic: "/driver/hslidar_left/hesai/pandar"
-  img_topic: "/left_camera/image"
+  # hesai_topic: "/driver/hslidar_left/hesai/pandar"
+  hesai_topic: "/driver/hslidar_front/pandar_points"
+  
+  # img_topic: "/left_camera/image"
+  img_topic: "/df/camera/7/image/compressed"
   
   imu_topic: "/driver/imu"
   img_en: 1
