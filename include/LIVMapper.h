@@ -84,7 +84,7 @@ public:
   double _first_lidar_time = 0.0;
   double match_time = 0, solve_time = 0, solve_const_H_time = 0;
 
-  bool lidar_map_inited = false, pcd_save_en = false, pub_effect_point_en = false, pose_output_en = false, ros_driver_fix_en = false;
+  bool lidar_map_inited = false, pcd_save_en = false, pub_effect_point_en = false, pose_output_en = false, ros_driver_fix_en = false, hilti_en = false;
   int pcd_save_interval = -1, pcd_index = 0;
   int pub_scan_num = 1;
 
@@ -139,7 +139,7 @@ public:
   PointCloudXYZRGB::Ptr pcl_wait_save;
   PointCloudXYZI::Ptr pcl_wait_save_intensity;
 
-  ofstream fout_pre, fout_out, fout_pcd_pos, fout_points, tum_file;
+  ofstream fout_pre, fout_out, fout_pcd_pos, fout_points;
 
   pcl::VoxelGrid<PointType> downSizeFilterSurf;
 

@@ -70,13 +70,13 @@ struct EIGEN_ALIGN16 Point
 {
   PCL_ADD_POINT4D;
   float intensity;
-  std::uint32_t t;
+  float time;
   std::uint16_t ring;
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 } // namespace velodyne_ros
 POINT_CLOUD_REGISTER_POINT_STRUCT(velodyne_ros::Point,
-                                  (float, x, x)(float, y, y)(float, z, z)(float, intensity, intensity)(std::uint32_t, t, t)(std::uint16_t, ring, ring))
+                                  (float, x, x)(float, y, y)(float, z, z)(float, intensity, intensity)(float, time, time)(std::uint16_t, ring, ring))
 /****************/
 
 /*** Ouster ***/
@@ -146,6 +146,7 @@ struct EIGEN_ALIGN16 Point
 } // namespace robosense_ros
 POINT_CLOUD_REGISTER_POINT_STRUCT(robosense_ros::Point,
                                   (float, x, x)(float, y, y)(float, z, z)(float, intensity, intensity)(double, timestamp, timestamp)(std::uint16_t, ring, ring))
+/*****************/
 
 class Preprocess
 {
@@ -175,6 +176,7 @@ private:
   void velodyne_handler(const sensor_msgs::PointCloud2::ConstPtr &msg);
   void xt32_handler(const sensor_msgs::PointCloud2::ConstPtr &msg);
   void Pandar128_handler(const sensor_msgs::PointCloud2::ConstPtr &msg);
+  void robosense_handler(const sensor_msgs::PointCloud2::ConstPtr &msg);
   void l515_handler(const sensor_msgs::PointCloud2::ConstPtr &msg);
   void give_feature(PointCloudXYZI &pl, vector<orgtype> &types);
   void pub_func(PointCloudXYZI &pl, const ros::Time &ct);
