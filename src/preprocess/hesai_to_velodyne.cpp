@@ -1,5 +1,6 @@
 // #include "utility.h"
 #include <ros/ros.h>
+#include <fstream>
 
 #include <sensor_msgs/PointCloud2.h>
 
@@ -47,13 +48,13 @@ struct VelodynePointXYZIRT
 
     PCL_ADD_INTENSITY;
     uint16_t ring;
-    float time;
+    float t;
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 } EIGEN_ALIGN16;
 
 POINT_CLOUD_REGISTER_POINT_STRUCT(VelodynePointXYZIRT,
-                                  (float, x, x)(float, y, y)(float, z, z)(float, intensity, intensity)(uint16_t, ring, ring)(float, time, time))
+                                  (float, x, x)(float, y, y)(float, z, z)(float, intensity, intensity)(uint16_t, ring, ring)(float, t, t))
 
 struct VelodynePointXYZIR
 {
@@ -100,6 +101,33 @@ void publish_points(T &new_pc, const sensor_msgs::PointCloud2 &old_msg)
     pc_new_msg.header = old_msg.header;
 
     pc_new_msg.header.frame_id = old_msg.header.frame_id;
+
+    static bool structure_written = false;
+    if (!structure_written)
+    {
+        std::ofstream ofs("/home/xyd/Project/private/FAST_LIVO2/src/FAST-LIVO2/src/preprocess/pointcloud_structure.txt");
+        if (ofs.is_open())
+        {
+            ofs << "height: " << pc_new_msg.height << std::endl;
+            ofs << "width: " << pc_new_msg.width << std::endl;
+            ofs << "is_bigendian: " << (pc_new_msg.is_bigendian ? "true" : "false") << std::endl;
+            ofs << "point_step: " << pc_new_msg.point_step << std::endl;
+            ofs << "row_step: " << pc_new_msg.row_step << std::endl;
+            ofs << "is_dense: " << (pc_new_msg.is_dense ? "true" : "false") << std::endl;
+            ofs << "fields:" << std::endl;
+            for (const auto& field : pc_new_msg.fields)
+            {
+                ofs << "  - name: " << field.name << std::endl;
+                ofs << "    offset: " << field.offset << std::endl;
+                ofs << "    datatype: " << (int)field.datatype << std::endl;
+                ofs << "    count: " << field.count << std::endl;
+            }
+            ofs.close();
+            ROS_INFO("PointCloud structure written to FAST-LIVO2/src/preprocess/pointcloud_structure.txt/pointcloud_structure.txt");
+            structure_written = true;
+        }
+    }
+
     pubRobosensePC.publish(pc_new_msg);
 }
 
@@ -180,6 +208,7 @@ template <typename T_in_p, typename T_out_p>
 void add_time(const typename pcl::PointCloud<T_in_p>::Ptr &pc_in,
               const typename pcl::PointCloud<T_out_p>::Ptr &pc_out)
 {
+    // ROS_INFO_ONCE("Field 't' is being added in hesai_to_velodyne.");
     // to new pointcloud
     int valid_point_id = 0;
     for (int point_id = 0; point_id < pc_in->points.size(); ++point_id)
@@ -187,7 +216,7 @@ void add_time(const typename pcl::PointCloud<T_in_p>::Ptr &pc_in,
         if (has_nan(pc_in->points[point_id]))
             continue;
         // 跳过nan点
-        pc_out->points[valid_point_id++].time = float(pc_in->points[point_id].timestamp - pc_in->points[0].timestamp);
+        pc_out->points[valid_point_id++].t = float(pc_in->points[point_id].timestamp - pc_in->points[0].timestamp);
         // std::cout << "time stamp point_id:" << point_id << "timestamp:" << pc_out->points[valid_point_id++].time << std::endl;
         // ROS_INFO_STREAM(pc_out->points[valid_point_id++].time);
     }

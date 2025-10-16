@@ -121,14 +121,31 @@ namespace Pandar128_ros
 struct EIGEN_ALIGN16 Point
 {
   PCL_ADD_POINT4D;
-  float timestamp;
-  uint8_t ring;
+  // uint8_t intensity;
+  PCL_ADD_INTENSITY;
+  double timestamp;
+  uint16_t ring;
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 } // namespace Pandar128_ros
 POINT_CLOUD_REGISTER_POINT_STRUCT(Pandar128_ros::Point,
-                                  (float, x, x)(float, y, y)(float, z, z)(float, timestamp, timestamp))
+                                  (float, x, x)(float, y, y)(float, z, z)(float, intensity, intensity)(double, timestamp, timestamp)(std::uint16_t, ring, ring))
 /*****************/
+
+/*** Robosense_Airy ***/
+namespace robosense_ros
+{
+struct EIGEN_ALIGN16 Point
+{
+  PCL_ADD_POINT4D;
+  float intensity;
+  double timestamp;
+  uint16_t ring;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+};
+} // namespace robosense_ros
+POINT_CLOUD_REGISTER_POINT_STRUCT(robosense_ros::Point,
+                                  (float, x, x)(float, y, y)(float, z, z)(float, intensity, intensity)(double, timestamp, timestamp)(std::uint16_t, ring, ring))
 
 class Preprocess
 {

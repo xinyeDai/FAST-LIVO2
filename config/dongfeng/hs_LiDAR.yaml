@@ -1,10 +1,12 @@
 common:
   # 勿改
-  lid_topic: "/velodyne_points"
+  # lid_topic: "/velodyne_points"
   
   # hesai_topic: "/driver/hslidar_left/hesai/pandar"
-  hesai_topic: "/driver/hslidar_front/pandar_points"
+  # hesai_topic: "/driver/hslidar_front/pandar_points"
   
+  lid_topic: "/driver/hslidar_front/pandar_points"
+
   # img_topic: "/left_camera/image"
   img_topic: "/df/camera/7/image/compressed"
   
@@ -29,7 +31,7 @@ time_offset:
 preprocess:
   point_filter_num: 1
   filter_size_surf: 0.1
-  lidar_type: 2 # Livox Avia LiDAR 1, Velodyne 2
+  lidar_type: 6 # Livox Avia LiDAR 1, Velodyne 2
   scan_line: 6
   blind: 0.8
 
